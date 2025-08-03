@@ -10,7 +10,7 @@ global timer_state , qnum , score_num
 timer_state = 1 # set the timers state to 1 which means its active
 score_num = 0
 ctk.set_appearance_mode("light")
-ctk.set_default_color_theme('Component Trialling/Program Theme/Theme 3/theme3.json')
+ctk.set_default_color_theme('Maths-Quiz-3PAD\program_theme.json')
 #Home Window
 class Home(ctk.CTk): #Initialise a class for the main window.
     def __init__(self):
