@@ -3,3 +3,5 @@ e,,x*8 = 64,8,What is x?
 i,Images\Easy\SquareArea_25.png,,25,What is the area of this square?
 i,Images\Easy\PythagorasShort_4.48.png,,4.5,What is the area of this square?
 e,,x*6 = 36,6,What is x?
+e,,(x-2)(x+4),x^2+2x-8,What is the result of the following when expanded?
+e,,x*4 = 32,8,What is x?
