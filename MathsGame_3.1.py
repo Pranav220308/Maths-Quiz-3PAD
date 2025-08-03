@@ -10,13 +10,16 @@ global timer_state , qnum , score_num
 timer_state = 1 # set the timers state to 1 which means its active
 score_num = 0
 ctk.set_appearance_mode("light")
-ctk.set_default_color_theme('program_theme.json')
+ctk.set_default_color_theme('Component Trialling/Program Theme/Theme 3/theme3.json')
 #Home Window
 class Home(ctk.CTk): #Initialise a class for the main window.
-    def __init__(self):
+    def __init__(self,difficulty_inst,quiz_inst,results_inst):
         super().__init__()
-        self.difficulty_mode = Difficulty(self) #Create instance variable for Difficulty class so functions, variables from that can be accessed. 
-        self.quiz = Quiz(self) #Create instance variable for Quiz class so functions and variables from that can be accessed. 
+        self.difficulty_mode = difficulty_inst
+        self.quiz = quiz_inst
+        self.results_page = results_inst
+        #self.difficulty_mode = Difficulty(self) #Create instance variable for Difficulty class so functions, variables from that can be accessed. 
+        #self.quiz = Quiz(self) #Create instance variable for Quiz class so functions and variables from that can be accessed. 
         undo_stack = []
         redo_stack = []
     def create_home(self): #This function is for setting up the main window. 
@@ -48,8 +51,6 @@ class Home(ctk.CTk): #Initialise a class for the main window.
         # Draw the 4 sides using lines
         draw.line([top, bottom], fill="black", width=10)        # Draw the line
         self.border = ctk.CTkImage(light_image=img, size=(200,500))
-    def home_button_setup(self): #This function is for setting up all the widgets on the main window. 
-        self.widget_seperation()
     def home_button_setup(self): #This function is for setting up all the widgets on the main window. 
         self.widget_seperation()
         self.border_lbl = ctk.CTkLabel(self,image=self.border, text = "" )
@@ -192,7 +193,7 @@ class Quiz():
     def __init__(self,home_inst):
         #Class instance variables
         self.homepage = home_inst #Create a variable that links to the home page
-        self.results_inst = Results(self)
+        self.results_inst = None
         self.qnum_current = -1 # I create a variable for keeping track of question number, this can be accessed anywhere inside of the class (function)
         #self.qnum_total = self.quiz.qamount_selector.get()
         self.quiz_questions = [] #Initialise an empty list for keeping track of the questions 
@@ -312,7 +313,10 @@ class Quiz():
         else:
             print("..... ;; Quiz Finished ")
             messagebox.showinfo("Quiz Finished", f"Your score is {self.score.get()} out of {len(self.quiz_questions)},\n Time taken was {self.timer.get()}")
-            self.results_inst.create_results()#Here is where the creation of the results window is called
+            self.end_quiz()
+    def end_quiz(self):
+            if self.results_inst:
+                self.results_inst.create_results()#Here is where the creation of the results window is called
     def check_answer(self): #This function is used to check if the students input matches the correct or wrong answer to the question. 
         student_input = self.q_response.get().strip()
         print("Program collecting user input")
@@ -342,7 +346,6 @@ class Quiz():
 class Results():
     def __init__(self,quiz_inst):
         self.quiz_page = quiz_inst #We are accessing the Quiz class by creating this instance variable.
-
     def create_results(self):
         #Global Variables for the class
         self.quiz_page.quiz.destroy()
@@ -351,12 +354,24 @@ class Results():
         self.results.config(bg="#b4cbed")
         self.results.geometry("680x520") #Set the window size
 def main(): #Main Function
-    home_page = Home()
+    #Setting up class instances
+    difficulty_window = Difficulty(None)
+    quiz_window = Quiz(None)
+    results_window = Results(quiz_window)
+    home_window = Home(difficulty_window,quiz_window,results_window)
+
+    #Linking the remaining classes now that they have been initialised.
+    quiz_window.home = home_window
+    quiz_window.results = results_window
+    difficulty_window.home = home_window
+    difficulty_window.quiz = quiz_window
+    results_window.quiz = quiz_window
+    results_window.home = home_window
     print("Opening Homepage...")
-    home_page.create_home()
-    home_page.bind("<Alt-q>",home_page.kill_event)
-    home_page.bind("<Alt-d>",home_page.create_difficulty_window) #When the keybind Alt Q is detected, program will terminate, it refers to function kill_event()
-    home_page.home_button_setup()
+    home_window.create_home()
+    home_window.bind("<Alt-q>",home_window.kill_event)
+    home_window.bind("<Alt-d>",home_window.create_difficulty_window) #When the keybind Alt Q is detected, program will terminate, it refers to function kill_event()
+    home_window.home_button_setup()
     warnings.filterwarnings("ignore", message=".*Given image is not CTkImage.*", category=UserWarning)
-    home_page.mainloop()
+    home_window.mainloop()
 main()
