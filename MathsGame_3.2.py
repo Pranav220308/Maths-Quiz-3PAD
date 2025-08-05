@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
 import random,sys,csv,time,os,warnings,json
-import numpy as np
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
