@@ -249,7 +249,7 @@ class Difficulty():
         with open(myFile, "r", encoding='utf-8') as file:  # Open the CSV file in read mode with UTF-8 encoding.
             for line_number, line_content in enumerate(file, 0): # Iterate over each  line in the file, starting from line 0.
                 # Append all content per row inside of the csvfiles to the quiz questions list, converting the content to lowercase.
-                self.quiz_questions.append(line_content)
+                self.quiz_questions.append(line_content.lower())
         # Shuffle the questions around to provide more playability.
         random.shuffle(self.quiz_questions)
         selected_amount = int(self.homepage.qamount_selector.get()) # Get the selected question amount from the home windows, question amount selector.
@@ -406,9 +406,11 @@ class Quiz():
             if question_type == 'i': # Check if the question type is an image.
                 # Show the image.
                 try: # Try to open the image file.
-                    self.img_lod = ctk.CTkImage(Image.open(question_imgfile),size=(125,200,Image.LANCZOS))
+                    self.img_lod = ctk.CTkImage(Image.open(question_imgfile),size=(125,200,Image.LANCZOS)) # Open the image file.
+                    og_width, og_height = self.img_init.size # Get the original width and height of the image.
+                    # Use a high-quality filter for downsampling
                     resized_img = self.img_init.resize( # Resize the image.
-                        125,200, Image.LANCZOS)
+                        (125,200), Image.LANCZOS)
                     self.resized_img = ctk.CTkImage(resized_img) # Convert the resized image to a CTKImage object.
                     self.img_label.configure(image=self.resized_img) # Configure the image label to display the resized image.
                 except FileNotFoundError: # If the image file is not found.

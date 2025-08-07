@@ -1,10 +1,10 @@
 e,,Determine f(x) given that f'(x) = 2x-8 and f(3) = 5,x^2-8x+20,
-e,,∫1/x³dx,-1/2x^2+C,Integrate this expression
+e,,∫1/x³dx,-1/2x^2+c,Integrate this expression
 e,,x+2 = 15,13,What is x?
 e,,logₓ(225)=2,15,What is x?
 i,Images\Easy\SquareArea_25.png,,25,What is the area of this square?
 i,Images\Easy\PythagorasShort_4.48.png,,4.5,What is the length of x?
 e,,x*6 = 36,6,What is x?
 e,,10x²+25x+14,20x+25,Differentiate this expression. 
-e,,∫1/x⁴dx,-1/3x^3+C,Integrate this expression
+e,,∫1/x⁴dx,-1/3x^3+c,Integrate this expression
 e,,∫2x³+4x²+12 dx,x^4/2 + 4x^3 / 3 + 12x + c, What is the integral of this expression?
