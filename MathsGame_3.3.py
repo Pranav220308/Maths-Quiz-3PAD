@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
-import random,sys,csv,time,os,warnings,json
+import random,sys,csv,time,os,warnings,json,webbrowser
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw , ImageTk
 music_paused = False
 global timer_state, qnum, score_num
 timer_state = 1  # The timer has 2 states , if timer_state is set to 1 the timer is active, if it is 0 the timer is stopped.
-score_num = 0
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme(
     'Component Trialling/Program Theme/Theme 3/theme3.json')
@@ -16,23 +15,23 @@ ctk.set_default_color_theme(
 
 
 class Home(ctk.CTk):  # Initialise a class for the main window.
-    def __init__(self, difficulty_inst, quiz_inst, leaderboard_inst):
+    def __init__(self, difficulty_inst, quiz_inst, leaderboard_inst): #This is the main constructor, this is where all the class instance variables are passed in. 
         super().__init__()
-        self.difficulty_mode = difficulty_inst #Store instance variables of the difficulty class so that attributes from it can be accessed here
-        self.quiz = quiz_inst
-        self.leaderboard = leaderboard_inst
+        self.difficulty_mode = difficulty_inst # Create instance variable for Difficulty class so functions, variables from that can be accessed.
+        self.quiz = quiz_inst # Create instance variable for Quiz class so functions and variables from that can be accessed.
+        self.leaderboard = leaderboard_inst # Create instance variable for Leaderboard class so functions and variables from that can be accessed.
         # self.difficulty_mode = Difficulty(self) #Create instance variable for Difficulty class so functions, variables from that can be accessed.
         # self.quiz = Quiz(self) #Create instance variable for Quiz class so functions and variables from that can be accessed.
-        undo_stack = []
-        redo_stack = []
+        self.pdf_path = "user_guide.pdf" # Create a variable for storing the user guide path.
 
     def create_home(self):  # This function is for setting up the main window.
-        self.title("Quavers Teaching Dillema")
-        self.geometry("680x520")
-        self.config(bg="#b4cbed")
-        self.resizable(False, False)
-        self.iconbitmap("qd16x16_log1.ico")
-        self.iconphoto(True, PhotoImage(file='qd16x16_logo1.png'))
+        self.title("Quavers Teaching Dillema") # Set the window title.
+        self.geometry("680x520") # Set the window size.
+        self.config(bg="#b4cbed") # Set the window background.
+        self.resizable(False, False) # Disable window resizing.
+        self.iconbitmap("qd16x16_log1.ico") # Set the window icon for the root window.
+        self.iconphoto(True, PhotoImage(file='qd16x16_logo1.png')) # Set the window icon for all windows.
+        # Row and column configurations for the home window 
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=0)
         self.grid_rowconfigure(2, weight=0)
@@ -42,13 +41,12 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=0, minsize=300, uniform='a')
         self.my_img = ctk.CTkImage(Image.open(
-            "QDLogo3_transp.png"), size=(300, 300, Image.LANCZOS))
+            "QDLogo3_transp.png"), size=(300, 300, Image.LANCZOS)) # A CTKImage object is created so that the logo file can be loaded in and dimensions can be set, as well as resampling.
         self.img_label = ctk.CTkLabel(
-            self, bg_color="#9dbbe7", text='', image=self.my_img)
-        self.img_label.grid(row=0, column=0, sticky='w')
-        self.myframe = ctk.CTkFrame(master=self)
+            self, bg_color="#9dbbe7", text='', image=self.my_img) # A CTKLabel object needs to be created in order for the image to actually be displayed, CTKImage objects do not act as labels.
+        self.img_label.grid(row=0, column=0, sticky='w') # Display the image on the main window.
 
-    def widget_seperation(self):
+    def widget_seperation(self): #Function for creating the divider/ separator on the main window.
         img = Image.new("RGBA", (200, 500), (180, 203, 237, 255))
         draw = ImageDraw.Draw(img)
 
@@ -59,29 +57,38 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
         draw.line([top, bottom], fill="black", width=10)        # Draw the line
         self.border = ctk.CTkImage(light_image=img, size=(200, 500))
 
-    # This function is for setting up all the widgets on the main window.
+    # This function is for setting up all the widgets on the home window.
     def home_button_setup(self):
         self.widget_seperation()
-        self.border_lbl = ctk.CTkLabel(self,image=self.border, text = "" )
-        self.border_lbl.grid(row=0,column=1,padx=(0,200),pady=(10,0),sticky='nsew',columnspan=1,rowspan=1)
-        self.username_lbl = ctk.CTkLabel(self, width=90,text="Username",font=("Lexend",14,'bold'),bg_color="#9dbbe7")
-        self.username_lbl.grid(row=0,column=(1),rowspan=1,padx=(0,200),pady=(50,0), sticky = "ne")
-        self.username_entry = ctk.CTkEntry(self,width = 130,bg_color="#b4cbed",font=("Lexend",14,'bold'))
-        self.username_entry.grid(row=0,column=1,columnspan=1,padx=(0,50),pady=(50,0),sticky='ne')
-        self.qamount_lbl = ctk.CTkLabel(self, width=90,text="Question Amount",font=("Lexend",14,'bold'),bg_color="#9dbbe7")
-        self.qamount_lbl.grid(row=0,column=1,rowspan=1,padx=(0,50),pady=(196,0), sticky = 'n')
+        self.border_lbl = ctk.CTkLabel(self,image=self.border, text = "" ) # Create label object for the divider so that it can be displayed.
+        self.border_lbl.grid(row=0,column=1,columnspan=1,rowspan=1,padx=(0,200),pady=(10,0),sticky='nsew',) # Position the divider object on the home window.
+        self.username_lbl = ctk.CTkLabel(self, width=90,text="Username",font=("Lexend",14,'bold'),bg_color="#9dbbe7") 
+        # Create label object for the username label and set configurations(font, background).
+        self.username_lbl.grid(row=0,column=(1),rowspan=1,padx=(0,200),pady=(50,0), sticky = "ne") # Display the username entry label on the main window. 
+        self.username_entry = ctk.CTkEntry(self,width = 130,bg_color="#b4cbed",font=("Lexend",14,'bold')) 
+        # Create an entry object for the username, so the user can actually enter a username.
+        self.username_entry.grid(row=0,column=1,columnspan=1,padx=(0,50),pady=(50,0),sticky='ne') # Position the username entry on the home window. 
+        self.qamount_lbl = ctk.CTkLabel(self, width=90,text="Question Amount",font=("Lexend",14,'bold'),bg_color="#9dbbe7") 
+        # Create a label for the question amount selector and apply configurations.
+        self.qamount_lbl.grid(row=0,column=1,rowspan=1,padx=(0,50),pady=(196,0), sticky = 'n') # Display the question amount selector label on the home window. 
         self.qamount_selector = ctk.CTkComboBox(self,values=['3','10','15'],font=("Lexend",14,"bold"),bg_color="#b4cbed",state='readonly')
-        self.qamount_selector.set("")
-        self.qamount_selector.grid(row=0,column=1,columnspan=1,padx=(0,20),pady=(0,90),sticky='e')
+        # Create a combobox object, this is the object used to create a drop down selection, here the user can select how many questions they want to go through.
+        self.qamount_selector.set("") # Set the value of the combobox to an empty string when the program is loaded.
+        self.qamount_selector.grid(row=0,column=1,columnspan=1,padx=(0,20),pady=(0,90),sticky='e') # Display the question amount selector on the home window. 
         self.leaderboard_button = ctk.CTkButton(self, text="Leaderboard",font=("Lexend",14,'bold'),width=140,bg_color="#b4cbed",command = self.leaderboard.create_leaderboard_window)
         self.leaderboard_button.grid(row=0, column=1,ipadx=10,ipady=10,padx=(0,75), pady=(0,160),rowspan=1,sticky='se')
         self.difficulty_button = ctk.CTkButton(self, text="Choose Difficulty",font=("Lexend",14,'bold'),width=140,bg_color="#b4cbed", command=self.create_difficulty_window)
         self.difficulty_button.grid(row=0, column=1,ipadx=10,ipady=10,padx=(0,75), pady=(0,80),rowspan=1,sticky='se')
         self.quiz_button = ctk.CTkButton(self, text="Start the Quiz!",font=("Lexend",14,'bold'),bg_color="#b4cbed", command=self.create_quiz_window)
         self.quiz_button.grid(row=0, column=1,ipadx=10,ipady=10,rowspan=3,sticky='se',padx=(0,75))
-        self.about = ctk.CTkButton(self, text="About",font=("Lexend",14,'bold'),bg_color="#b4cbed")
-        self.about.grid(row=0,column=0,sticky='sw',ipady=10,ipadx=10,padx=(70,0))
+        self.help = ctk.CTkButton(self, text="Help",font=("Lexend",14,'bold'),bg_color="#b4cbed",command=self.access_user_guide)
+        self.help.grid(row=0,column=0,sticky='sw',ipady=10,ipadx=10,padx=(70,0))
 
+    def access_user_guide(self,event=None):
+            if os.path.exists(self.pdf_path):
+                webbrowser.open(self.pdf_path)
+            else:
+                messagebox.showinfo("Error",f"Could not locate {self.pdf_path}.")
     def kill_event(self, event):
         sys.exit(0)
     def clear_widgets(self):
@@ -91,9 +98,7 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
             elif isinstance(widget,ctk.CTkComboBox):
                 widget.set("")
     def reset_game_state_quiz(self):
-        global timer_state, score_num
-        timer_state = 1
-        score_num = 0
+        self.quiz.timer_state = 0
         self.difficulty_mode.difficulty_chosen = False
         self.difficulty_mode.quiz_questions = []
         self.quiz.quiz_questions = []
@@ -101,23 +106,18 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
         self.clear_widgets()
 
     def reset_game_state_home(self):
-        global timer_state, score_num
-        timer_state = 1
-        score_num = 0
+        global timer_state
+        #self.quiz.timer_state = 0
         self.difficulty_mode.difficulty_chosen = False
         self.difficulty_mode.quiz_questions = []
         self.quiz.quiz_questions = []
         self.quiz.qnum_current = -1
 
     # Function made so that difficulty window can be accessed when the 'Difficulty' button is clicked.
-    def create_difficulty_window(self):
-        print("Creating Difficulty Mode Window..")
+    def create_difficulty_window(self,event=None):
         self.difficulty_mode.create_difficulty()
-        self.difficulty_mode.diff_button_setup()
-        print("..... > Difficulty Mode Window Created")
 
-    def create_quiz_window(self):
-        # if self.username_validity == 1:
+    def create_quiz_window(self,event=None):
         if self.username_validator() == True:
             if len(self.qamount_selector.get()) != 0:
                 if self.difficulty_mode.difficulty_chosen == True:
@@ -128,7 +128,6 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
                     self.clear_widgets()
                     self.withdraw()
                     self.quiz.create_questions_window()
-                    print("Loading Quiz Window...")
                 elif self.difficulty_mode.difficulty_chosen == False:
                     messagebox.showwarning(
                         "Warning", "You cannot start the quiz without selecting a difficulty")
@@ -152,7 +151,6 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
                 "Warning", "There should be no whitespaces in the username..\nProgram will remove the whitespaces found.")
             self.username_entry.delete(0, END)
             self.username_entry.insert(0, self.username_input.replace(" ", ""))
-            # print("whitespaces")
             return False
         elif len(self.username_input) > 12:
             messagebox.showwarning(
@@ -165,7 +163,6 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
                 "Warning", "Username cannot be less than 4 characters ")
             return False
         else:
-            print("valid name")
             return True
 
     # This function is for storing the user details.
@@ -174,7 +171,6 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
         f_path = "user_details.json"
         # Create a blank list for the users details, certain criteria is appended later.
         user_details = []
-        print("init list for storing user details")
         user_details.append([self.username_input, self.qamount_selector.get(
         ), self.difficulty_mode.difficulty_level])
         try:
@@ -187,9 +183,6 @@ class Home(ctk.CTk):  # Initialise a class for the main window.
 
         with open(f_path, 'w') as file:
             json.dump(user_data, file, indent=4)
-
-    def undo_username():  # WIP
-        print("")
 
 # Difficulty Mode Window
 
@@ -214,25 +207,30 @@ class Difficulty():
 
     def create_difficulty(self):  # Setup for difficulty window
         self.difficulty = Toplevel(self.homepage)
-        self.difficulty.config(background="#000000")
-        self.difficulty.title("Difficulty")
+        self.difficulty.config(background="#d9e4f4")
+        self.difficulty.title("Select Difficulty")
         self.difficulty.geometry("400x250")
-        self.difficulty.grid_columnconfigure((0, 3), weight=1)
-        self.difficulty.grid_rowconfigure((0, 3), weight=0)
+        #self.difficulty.resizable(False,False) #Prevent the user from being able to resize the window
+        self.difficulty.columnconfigure(0,weight=1)
+        self.difficulty.columnconfigure(1,weight=0)
+        self.difficulty.rowconfigure(0,weight=0)
+        self.difficulty.rowconfigure(1,weight=0)
      # Button Setup for difficulty window
-
+        self.diff_button_setup()
     def diff_button_setup(self):
-
+        self.button_frame = ctk.CTkFrame(self.difficulty,fg_color="#9dbbe7")
+        self.button_frame.grid(row=1,column=0,sticky='ew',padx=20,pady=5)
         self.difficulty_mode_colors = [
             '#11A800', '#DDFF00', '#820000', "#A161AF"]
         for entry in range(len(self.difficulty_modes)):
-            self.Buttons = ctk.CTkButton(self.difficulty,
+            buttons = ctk.CTkButton(self.button_frame,
                                          text=self.difficulty_modes[entry],
                                          font=("Lexend", 16),
+                                         border_width=2,
                                          fg_color=self.difficulty_mode_colors[entry],
                                          text_color="#000000",
                                          command=lambda i=entry: self.read_difficulty_file(i))
-            self.Buttons.grid(pady=10, padx=(50, 0))
+            buttons.grid(row=entry,column = 0,pady=7,padx=66)
 
     def read_difficulty_file(self, listIndex):
         # Here we are storing the condition that the user has chosen a difficulty and is true.
@@ -244,17 +242,12 @@ class Difficulty():
         with open(myFile, "r", encoding='utf-8') as file:
             for line_number, line_content in enumerate(file, 0):
                 # We append all content per row inside of the csvfiles to this blank list.
-                self.quiz_questions.append(line_content)
+                self.quiz_questions.append(line_content.lower())
         # Shuffle the questions around to provide more playability.
         random.shuffle(self.quiz_questions)
         selected_amount = int(self.homepage.qamount_selector.get())
         self.quiz_questions = self.quiz_questions[:selected_amount]
-        print(
-            f"Loaded {len(self.quiz_questions)} questions for {self.difficulty_level}")
         self.difficulty.destroy()
-
-        # for i in self.quiz_questions:
-        # print(i)
 
 
 # Quiz Window
@@ -287,7 +280,6 @@ class Quiz():
         self.show_next_question()
 
     def start_ques(self):
-        print(f"Question Amount: {self.homepage.stored_qamount}")
         self.q = ctk.CTkLabel(
             self.quiz, text="", text_color="#000000", font=("Lexend", 16, "bold"))
         self.q.grid(row=4, column=3)
@@ -297,7 +289,7 @@ class Quiz():
         self.q_response = ctk.CTkEntry(self.quiz, font=("Lexend", 14, "bold"))
         self.q_response.grid(row=6, column=3, columnspan=3, padx=20, pady=40)
         self.q_submit = ctk.CTkButton(self.quiz, text="Submit", font=(
-            "Lexend", 18, "bold"), command=self.check_answer)
+            "Lexend", 16, "bold"), command=self.check_answer)
         self.q_submit.grid(row=8, column=3, padx=20)
         self.quiz.bind("<Return>",lambda event: self.check_answer())
         self.img_label = ctk.CTkLabel(self.quiz, text='')
@@ -388,14 +380,9 @@ class Quiz():
         new_score = str(current_score + 1)
         self.score.set(new_score)
 
-    def shuffle_questions(self):
-        print("")
-
     def show_next_question(self):
         self.qnum_current = self.qnum_current + 1
-        print("self.quiz_questions= " + str(len(self.quiz_questions)))
         if self.qnum_current < len(self.quiz_questions):
-            print("self.qnum_current = " + str(self.qnum_current))
             current = self.quiz_questions[self.qnum_current]
             # Show question
             row_content = current.split(",")
@@ -406,6 +393,8 @@ class Quiz():
             self.q.configure(
                 text=f"Q{self.qnum_current + 1}: {question_equation}")
             self.q_statement.configure(text=f"{question_statement}")
+            if self.qnum_current == len(self.quiz_questions) - 1:
+                self.q_submit.configure(text='Finish Quiz')
             if question_type == 'i':
                 # Show image
                 try:
@@ -421,9 +410,8 @@ class Quiz():
                     self.img_label.configure(image=self.resized_img)
                 except FileNotFoundError:
                     self.img_label.configure(text="Image not found", image='')
-                    print(os.path.dirname(__file__) + f" {question_imgfile} ")
             else:
-                self.img_label.configure(image='', text='')
+                self.img_label.configure(image='', text='') 
         else:
             self.stop_timer()
             messagebox.showinfo(
@@ -431,14 +419,12 @@ class Quiz():
                 f"\nYou got {self.score.get()}/{len(self.quiz_questions)}correct."
                 f"\nTime taken was {self.timer.get()}")
             self.end_quiz()
-        self.actual_score = f"{self.score.get()}/{len(self.quiz_questions)}"
     def end_quiz(self): #This function is used for ending the quiz
+        self.actual_score = f"{self.score.get()}/{len(self.quiz_questions)}"
         self.store_leaderboard_data()
-        self.quiz.withdraw() #This throws the quiz window in memory without actually destroying it.
+        self.quiz.destroy() #Destroy the quiz window, to prevent further issues from occuring
         self.homepage.deiconify() #Here I bring the home window back from memory, deiconfiy() retrieves the home window from memory. 
         self.leaderboard.create_leaderboard_window() #This is where the creation of the leaderboard window is done. 
-        print("Creating leaderboard window")
-        print("Leaderboard widgets loaded")
     def return_home_quiz(self):
             exit_home = messagebox.askyesno("Return to home","Would you like to exit the quiz")
             if exit_home == 1:
@@ -453,17 +439,14 @@ class Quiz():
 
     # This function is used to check if the students input matches the correct or wrong answer to the question.
     def check_answer(self): #This function is used to check if the students input matches the correct or wrong answer to the question. 
-        student_input = self.q_response.get().strip()
-        print("Program collecting user input")
+        student_input = self.q_response.get().lower().strip() 
         self.correct_ans = self.quiz_questions[self.qnum_current].split(",")[3]
         if student_input == self.correct_ans: #Answer validation
             self.score_increment()
-            print("Score increased,correct answer")
             self.q_response.delete(0,END)
             self.show_next_question()
         elif len(student_input) ==0:
             self.stop_timer()
-            print("Answer contains blanks")
             messagebox.showwarning("Warning","Answer field cannot be left blank")
             self.start_time()
             return
@@ -471,15 +454,12 @@ class Quiz():
             self.stop_timer()
             messagebox.showwarning("Warning","Answer cannot be above 30 characters")
             self.start_time()
-            print("Character limit exceeded")
             return
         elif " " in student_input:
-            print("Whitespaces")
             messagebox.showwarning("Warning","No spaces between your answer")
             self.start_time()
             return
         else:
-            print("Score did not increase,incorrect answer")
             self.q_response.delete(0, tk.END)
             self.show_next_question()
 
@@ -488,7 +468,6 @@ class Quiz():
         f_path = "leaderboard_details.json"
         # Create a blank list for the users details, certain criteria is appended later.
         lb_details = [] #lb - short for leaderboard, here we initialise a blank list which is updated later onwards.
-        print("init list for storing details needed for the leaderboard")
         lb_details.append([self.homepage.stored_username,self.homepage.stored_qamount, #Appending username, question amount the user selected.
                            #These details are later on used for the leaderboard
                            self.difficulty.difficulty_level,self.actual_score,self.timer.get()]) #Appending the difficulty level, the score and time taken to this list specifically used to display certain criteria on the leaderboard.
@@ -510,7 +489,7 @@ class Leaderboard():
         # We are accessing the Quiz class by creating this instance variable.
         self.quiz_page = quiz_inst
         self.homepage = home_inst
-    def create_leaderboard_window(self):
+    def create_leaderboard_window(self,event=None):
         # Global Variables for the class
         self.leaderboard = Toplevel(self.homepage)
         self.leaderboard.title("Leaderboard")  # Set the window title
@@ -519,53 +498,105 @@ class Leaderboard():
         self.leaderboard.resizable(False,False)
         self.leaderboard.protocol("WM_DELETE_WINDOW",self.close_leaderboard)
         #Row and column configuration
-        self.leaderboard.grid_rowconfigure(0,weight=1)
+        self.leaderboard.grid_rowconfigure(0,weight=0)
+        self.leaderboard.grid_rowconfigure(1,weight=1)
         self.leaderboard.grid_columnconfigure(0,weight=1)
+        self.leaderboard.grid_columnconfigure(1,weight=0)
         self.create_leaderboard()
         self.display_lb_data()
     def create_leaderboard(self): #Function which sets up the leaderboard (treeview)
+        self.return_homewin = ctk.CTkButton(self.leaderboard, text="Return Home", font=(
+            "Lexend", 14, "bold"), command=self.close_leaderboard)
+        self.return_homewin.grid(row=0,column=0,sticky='e',padx=90)
+        self.return_homewin = ctk.CTkButton(self.leaderboard, text="Remove Entry", font=(
+            "Lexend", 14, "bold"), command=self.tree_row_deletion)
+        self.return_homewin.grid(row=0,column=0,sticky='w',padx=90)
         self.tree = ttk.Treeview(self.leaderboard, columns=("rank", "player", "score","time","difficulty"), show="headings") #Assign the column ids for each field in the leaderboard and show the headings.
+        self.tree.grid(row=1,column=0,sticky='nsew')
         style = ttk.Style() #Initialise style object for leaderboard
         style.theme_use('default')
-        style.configure('Treeview', background='#9dbbe7',fieldbackground="#d3ddec", foreground='black', rowheight=25,) #Configure the leaderboard sty
+        style.configure('Treeview',background='#9dbbe7',fieldbackground="#d3ddec", foreground='black', rowheight=30,) #Configure the leaderboard sty
         style.configure('Treeview.Heading',background='#7ba3d1', font=('Lexend',12,'bold')) 
         self.tree.heading("rank", text="Rank")
         self.tree.heading("player", text="Player Name")
         self.tree.heading("score", text="Score")
         self.tree.heading("time", text="Time")
         self.tree.heading("difficulty", text="Difficulty Played")
-          # Configure column properties
-        self.tree.column("rank", width=40,anchor=tk.CENTER)
+          # Configure column properties in the treeview
+        self.tree.column("rank",stretch=False, width=60,anchor=tk.CENTER)
         self.tree.column("player", width=80, anchor=tk.CENTER)
         self.tree.column("score", width=50, anchor=tk.CENTER)
         self.tree.column("time",width=120,anchor=tk.CENTER )
         self.tree.column("difficulty",width=80,anchor=tk.CENTER)
-        self.tree.grid(row=0,column=0,sticky='nsew')
-        print("")
+        scroll_vert = ttk.Scrollbar(self.leaderboard,orient="vertical",command=self.tree.yview)
+        scroll_vert.grid(row=1,column=1,sticky='ns')
+        self.tree.configure(yscrollcommand=scroll_vert.set)
+        self.lock_column_widths()
     def close_leaderboard(self):
         self.leaderboard.destroy()
-        if self.quiz_page.end_quiz == True:
-            self.homepage.reset_game_state_quiz()
+        self.homepage.reset_game_state_quiz()
     def display_lb_data(self):
         try:
-            print("reading in the leaderboard_details json now...")
             with open("leaderboard_details.json", "r", encoding='utf-8') as file:
                     self.leaderboard_data = json.load(file)
-                    print(f"loaded {len(self.leaderboard_data)} entries.")
-                    print("appended content from json file")
         except (FileNotFoundError, json.JSONDecodeError):
             self.leaderboard_data = []
         for item in self.tree.get_children():
             self.tree.delete(item)
         for rank, entry in enumerate(self.leaderboard_data,1):
-            inner_array = entry[0]
-            player_name = inner_array[0]
-            question_amount = inner_array[1]
-            difficulty_mode = inner_array[2]
-            actual_score = inner_array[3]
-            time_taken = inner_array[4]
+            self.inner_array = entry[0]
+            player_name = self.inner_array[0]
+            question_amount = self.inner_array[1]
+            difficulty_mode = self.inner_array[2]
+            actual_score = self.inner_array[3]
+            time_taken = self.inner_array[4]
             self.tree.insert('','end',values=(rank,player_name,actual_score,time_taken,difficulty_mode))
+    def tree_row_deletion(self): #Function used for deleting an entry off the tree
+        selected_items = self.tree.selection()
+        try:
+            if not selected_items:
+                messagebox.showwarning("Warning","You need to select a row before you can delete it.")
+            else:
+                entry = selected_items[0]
+                entry_value = self.tree.item(entry,'values')
+                confirm_deletion = messagebox.askyesno("Confirm Action",f"Do you want to proceed with deleting {entry_value[1]}? ")
+        except Exception:
+                messagebox.showwarning("Warning","Please select a row to delete.")
+        if confirm_deletion:
+            selected_entry = int(entry_value[0]) - 1
+            self.remove_entry_from_json(selected_entry)
+            self.display_lb_data()
+    def remove_entry_from_json(self,entry_to_remove):
+        f_path = "leaderboard_details.json"
+        try:
+         with open(f_path, 'r') as file:
+            removal_lb_data = json.load(file)
+         if 0 <= entry_to_remove < len(removal_lb_data): 
+            del removal_lb_data[entry_to_remove]
+            with open(f_path,'w') as file:
+                json.dump(removal_lb_data,file,indent=4)
+         else:
+            messagebox.showerror("Eror","Entry selection is invalid")
 
+        except(FileNotFoundError, json.JSONDecodeError) as e:
+            messagebox.showerror("Error","The entry was not able to be removed.")
+
+    def lock_column_widths(self):
+        fixed_column_widths = {
+            "rank": 60,
+            "player": 80,
+            "score": 50,
+            "time": 120,
+            "difficulty": 80
+        }
+        for col, width in fixed_column_widths.items():
+            self.tree.column(col,width=width)
+        def prevent_resize_columns(event):
+            cursor_region = self.tree.identify_region(event.x,event.y)
+            if cursor_region == "separator":
+                return "break"
+        self.tree.bind("<Button-1>",prevent_resize_columns)
+        self.tree.bind("<B1-Motion>",prevent_resize_columns)
 def main():
     # Setting up class instances
     # An instance variable for the 'Difficulty' class has been created, "None" is passed in the arguments as the other classes do not exist currently
@@ -587,12 +618,12 @@ def main():
     quiz_window.homepage = home_window
     leaderboard_window.homepage = home_window  # Use 'homepage' not 'home'
     leaderboard_window.quiz_page = quiz_window  # Use 'quiz_page' not 'quiz'
-
-    print("Opening Homepage...")
     home_window.create_home()
-    home_window.bind("<Alt-q>", home_window.kill_event)
-    # When the keybind Alt Q is detected, program will terminate, it refers to function kill_event()
-    home_window.bind("<Alt-d>", home_window.create_difficulty_window)
+    # Bind certain functions from the home window to a set of keybinds (Ctrl + d - accesses the difficulty window)
+    home_window.bind("<Control-q>", home_window.kill_event)
+    home_window.bind("<Control-d>", home_window.create_difficulty_window)
+    home_window.bind("<Control-h>",home_window.access_user_guide)
+    home_window.bind("<Control-l>",home_window.leaderboard.create_leaderboard_window)
     home_window.home_button_setup()
     warnings.filterwarnings("ignore", message=".*Given image is not CTkImage.*", category=UserWarning)
     home_window.mainloop()
